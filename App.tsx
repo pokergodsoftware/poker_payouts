@@ -5,6 +5,8 @@ import { generatePayoutsFromJson } from './services/geminiService';
 import UploadIcon from './components/icons/UploadIcon';
 import Spinner from './components/Spinner';
 
+const APP_VERSION = "1.0.1";
+
 const PayoutTable: React.FC<{ payouts: PayoutEntry[] }> = ({ payouts }) => {
   return (
     <div className="w-full max-h-60 overflow-y-auto rounded-lg border border-gray-700">
@@ -255,6 +257,10 @@ const App: React.FC = () => {
             </div>
           )}
         </main>
+        
+        <footer className="text-center mt-8 text-sm text-gray-500">
+            <p>Version: {APP_VERSION}</p>
+        </footer>
       </div>
     </div>
   );

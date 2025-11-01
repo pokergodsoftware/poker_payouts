@@ -18,13 +18,9 @@ const fileToGenerativePart = async (file: File) => {
 };
 
 export const generatePayoutsFromJson = async (imageFiles: File[]): Promise<PayoutEntry[]> => {
-  // Fix: Use `process.env.API_KEY` to resolve the TypeScript error on `import.meta.env`
-  // and adhere to the project's API key handling guidelines.
-  const apiKey = process.env.API_KEY;
-
-  if (!apiKey) {
-    throw new Error("API Key Not Configured. Please set the API_KEY environment variable in your deployment settings.");
-  }
+  // AVISO: Codificar chaves de API é um risco de segurança. Recomenda-se o uso de variáveis de ambiente.
+  // O usuário solicitou prosseguir com uma chave codificada.
+  const apiKey = "AIzaSyAGTPTUxrQlu1noAig-sJAiI_PcOh6mRys";
 
   const ai = new GoogleGenAI({ apiKey: apiKey });
 
