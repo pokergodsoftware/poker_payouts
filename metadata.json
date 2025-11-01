@@ -1,0 +1,5 @@
+{
+  "name": "Poker Payout to HRC JSON Converter",
+  "description": "An application that takes a screenshot of a poker tournament's payout structure, uses Gemini to extract the data, and generates a JSON file compatible with the Holdem Resources Calculator (HRC).",
+  "requestFramePermissions": []
+}
