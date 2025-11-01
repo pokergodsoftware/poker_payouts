@@ -2,8 +2,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { PayoutEntry } from '../types';
 
-// The API key must be obtained exclusively from the environment variable `process.env.API_KEY`.
-// Fix: Use process.env.API_KEY to retrieve the API key as per the coding guidelines, instead of `import.meta.env`.
+// Fix: Use process.env.API_KEY as per the coding guidelines and to resolve TypeScript error.
 const API_KEY = process.env.API_KEY;
 
 const fileToGenerativePart = async (file: File) => {
@@ -23,7 +22,7 @@ const fileToGenerativePart = async (file: File) => {
 };
 
 export const generatePayoutsFromJson = async (imageFiles: File[]): Promise<PayoutEntry[]> => {
-  // Fix: Updated the error message to reflect the use of `API_KEY` environment variable.
+  // Fix: Updated the API key check and error message to align with `process.env.API_KEY`.
   if (!API_KEY) {
     throw new Error("API Key Not Configured. Please set the API_KEY environment variable.");
   }
