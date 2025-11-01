@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { PayoutEntry } from '../types';
 
@@ -19,12 +18,15 @@ const fileToGenerativePart = async (file: File) => {
 };
 
 export const generatePayoutsFromJson = async (imageFiles: File[]): Promise<PayoutEntry[]> => {
-  // Fix: Per coding guidelines, API key must be from process.env.API_KEY. This resolves the TypeScript error `Property 'env' does not exist on type 'ImportMeta'`.
-  if (!process.env.API_KEY) {
-    throw new Error("API Key Not Configured. Please set the API_KEY environment variable.");
+  // Fix: Use `process.env.API_KEY` to resolve the TypeScript error on `import.meta.env`
+  // and adhere to the project's API key handling guidelines.
+  const apiKey = process.env.API_KEY;
+
+  if (!apiKey) {
+    throw new Error("API Key Not Configured. Please set the API_KEY environment variable in your deployment settings.");
   }
 
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: apiKey });
 
   const imageParts = await Promise.all(imageFiles.map(fileToGenerativePart));
   
