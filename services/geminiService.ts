@@ -20,7 +20,7 @@ const fileToGenerativePart = async (file: File) => {
 
 export const generatePayoutsFromJson = async (imageFiles: File[]): Promise<PayoutEntry[]> => {
   if (!process.env.API_KEY) {
-    throw new Error("API_KEY environment variable not set");
+    throw new Error("API Key Not Configured. Please set the API_KEY environment variable in your deployment settings.");
   }
 
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
