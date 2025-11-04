@@ -17,6 +17,8 @@ const fileToGenerativePart = async (file: File) => {
   };
 };
 
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export const generatePayoutsFromJson = async (imageFiles: File[]): Promise<PayoutEntry[]> => {
   const ai = new GoogleGenAI({ apiKey: "AIzaSyAGTPTUxrQlu1noAig-sJAiI_PcOh6mRys" });
 
@@ -33,46 +35,68 @@ export const generatePayoutsFromJson = async (imageFiles: File[]): Promise<Payou
     Return the final, combined, and de-duplicated data in the exact JSON format specified by the provided schema. Only return the JSON data.
   `;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [
-        { parts: [
-            ...imageParts,
-            { text: prompt },
-        ] },
-      ],
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              position: {
-                type: Type.INTEGER,
-                description: "The finishing rank as an integer.",
+  const MAX_RETRIES = 3;
+  let delay = 2000; // 2 seconds
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: [
+          { parts: [
+              ...imageParts,
+              { text: prompt },
+          ] },
+        ],
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                position: {
+                  type: Type.INTEGER,
+                  description: "The finishing rank as an integer.",
+                },
+                prize: {
+                  type: Type.NUMBER,
+                  description: "The prize money as a number, without currency symbols or commas.",
+                },
               },
-              prize: {
-                type: Type.NUMBER,
-                description: "The prize money as a number, without currency symbols or commas.",
-              },
+              required: ["position", "prize"],
             },
-            required: ["position", "prize"],
           },
         },
-      },
-    });
+      });
 
-    const parsedResponse = JSON.parse(response.text);
-    return parsedResponse as PayoutEntry[];
+      const parsedResponse = JSON.parse(response.text);
+      return parsedResponse as PayoutEntry[];
 
-  } catch (error) {
-    console.error("Error generating content from Gemini:", error);
-    // Rethrow with a more specific message if possible
-    if (error instanceof Error && error.message.includes('API key not valid')) {
-        throw new Error("API key not valid. Please ensure a valid API key is configured in your environment settings.");
+    } catch (error: any) {
+        console.error(`Error on attempt ${attempt}:`, error);
+
+        const isOverloadedError = error.toString().includes('503') || error.toString().includes('UNAVAILABLE') || error.toString().includes('overloaded');
+
+        if (isOverloadedError && attempt < MAX_RETRIES) {
+            console.log(`Model is overloaded. Retrying in ${delay / 1000}s...`);
+            await sleep(delay);
+            delay *= 2; // Exponential backoff
+            continue;
+        }
+
+        // Handle final attempt or other non-retryable errors
+        if (error instanceof Error && error.message.includes('API key not valid')) {
+            throw new Error("API key not valid. Please ensure a valid API key is configured in your environment settings.");
+        }
+        if (isOverloadedError) {
+            throw new Error("The model is currently overloaded. We tried multiple times without success. Please try again in a few minutes.");
+        }
+        
+        throw new Error("Failed to process the image with Gemini API. Check the console for details.");
     }
-    throw new Error("Failed to process the image with Gemini API. Check the console for details.");
   }
+
+  // This part should be unreachable, but it's a fallback.
+  throw new Error("Failed to get a response from the model after multiple attempts.");
 };
