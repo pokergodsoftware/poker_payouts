@@ -18,11 +18,7 @@ const fileToGenerativePart = async (file: File) => {
 };
 
 export const generatePayoutsFromJson = async (imageFiles: File[]): Promise<PayoutEntry[]> => {
-  // AVISO: Codificar chaves de API é um risco de segurança. Recomenda-se o uso de variáveis de ambiente.
-  // O usuário solicitou prosseguir com uma chave codificada.
-  const apiKey = "AIzaSyAGTPTUxrQlu1noAig-sJAiI_PcOh6mRys";
-
-  const ai = new GoogleGenAI({ apiKey: apiKey });
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   const imageParts = await Promise.all(imageFiles.map(fileToGenerativePart));
   
@@ -31,7 +27,7 @@ export const generatePayoutsFromJson = async (imageFiles: File[]): Promise<Payou
     Your task is to combine the data from all images into one complete, ordered list. You must de-duplicate any overlapping ranks that appear across different images.
     For each entry, extract the finishing position (rank) and its corresponding prize money.
     For rank ranges like '11 ~ 12' or '16 - 20', you must expand this range and create a separate entry for each individual rank (e.g., for '16 - 20', create entries for 16, 17, 18, 19, and 20), with all of them having the same prize money.
-    Ignore currency symbols (like $, €) and commas in the prize money when extracting the value.
+    Ignore currency symbols (like $, €), commas, and any trailing text (like "+ Bounty") in the prize money column. Extract only the numerical value of the prize.
     Return the final, combined, and de-duplicated data in the exact JSON format specified by the provided schema. Only return the JSON data.
   `;
 

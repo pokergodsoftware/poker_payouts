@@ -1,11 +1,10 @@
-
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { PayoutEntry } from './types';
 import { generatePayoutsFromJson } from './services/geminiService';
 import UploadIcon from './components/icons/UploadIcon';
 import Spinner from './components/Spinner';
 
-const APP_VERSION = "1.0.1";
+const APP_VERSION = "1.1.0";
 
 const PayoutTable: React.FC<{ payouts: PayoutEntry[] }> = ({ payouts }) => {
   return (
@@ -219,19 +218,19 @@ const App: React.FC = () => {
 
           {imageFiles.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                 <button
-                  onClick={handleReset}
-                  className="w-full flex justify-center items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-                >
-                    Reset
-                </button>
                 <button
-                  onClick={handleGenerateJson}
-                  disabled={isLoading}
-                  className="w-full flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-900 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-colors"
-                >
-                  {isLoading ? <><Spinner/> Processing Images...</> : 'Generate HRC JSON'}
-                </button>
+                onClick={handleReset}
+                className="w-full flex justify-center items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-colors"
+              >
+                  Reset
+              </button>
+              <button
+                onClick={handleGenerateJson}
+                disabled={isLoading}
+                className="w-full flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-900 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-colors"
+              >
+                {isLoading ? <><Spinner/> Processing Images...</> : 'Generate HRC JSON'}
+              </button>
             </div>
           )}
 
