@@ -18,8 +18,7 @@ const fileToGenerativePart = async (file: File) => {
 };
 
 export const generatePayoutsFromJson = async (imageFiles: File[]): Promise<PayoutEntry[]> => {
-  // IMPORTANT: Replace "INSERT_YOUR_API_KEY_HERE" with your actual Gemini API key.
-  const ai = new GoogleGenAI({ apiKey: "INSERT_YOUR_API_KEY_HERE" });
+  const ai = new GoogleGenAI({ apiKey: "AIzaSyAGTPTUxrQlu1noAig-sJAiI_PcOh6mRys" });
 
   const imageParts = await Promise.all(imageFiles.map(fileToGenerativePart));
   
@@ -70,6 +69,10 @@ export const generatePayoutsFromJson = async (imageFiles: File[]): Promise<Payou
 
   } catch (error) {
     console.error("Error generating content from Gemini:", error);
-    throw new Error("Failed to process the image with Gemini API. Please check the console for details.");
+    // Rethrow with a more specific message if possible
+    if (error instanceof Error && error.message.includes('API key not valid')) {
+        throw new Error("API key not valid. Please ensure a valid API key is configured in your environment settings.");
+    }
+    throw new Error("Failed to process the image with Gemini API. Check the console for details.");
   }
 };
